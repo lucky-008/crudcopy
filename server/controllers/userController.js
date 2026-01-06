@@ -101,3 +101,34 @@ exports.getUserById= async(req,res)=>{
     }
 }
 
+
+exports.createUser = async(req,res)=>{
+    try {
+        const{name , email,phone,status}= req.body;
+        if(!name || !email || !phone)
+            return res.status(400).json({
+        message:"Name email  and phone are required"});
+
+
+        const existingUser = await User.findOne({email});
+        if(existingUser) return res.status(400).json({message:"already exist"});
+
+        const user =  new User ({
+            name,
+            email,
+            phone,
+            status : status || "Active"
+
+        })
+
+        await user.save();
+        res.status(201).json({user, message:"record created"} );
+
+                                                                 
+        
+    } catch (error) {
+                     res.status(500).json({message:"create user error", error: error.message})
+
+        
+    }
+}
