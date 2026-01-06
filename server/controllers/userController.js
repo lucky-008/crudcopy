@@ -132,3 +132,34 @@ exports.createUser = async(req,res)=>{
         
     }
 }
+
+
+exports.updateUser = async(req,res)=>{
+    try {
+         const{name , email,phone,status}= req.body;
+         if(email){
+            const exists = await User.find({email, _id: {$ne: req.params.id}});
+            if(exists){
+                return res.status(400).json({message:" email already exists"})
+            }
+         }
+
+         const  user= await User.findByIdAndUpdate(req.params.id,
+            {name ,email,phone,status},
+            {new:true,runValidators:true}
+         );
+         if(user) return res.status(404).json({message:"not found"
+
+         })
+         res.json(user);
+
+
+         
+        
+    } catch (error) {
+                             res.status(500).json({message:"update user error", error: error.message})
+
+        
+        
+    }
+}
