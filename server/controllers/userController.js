@@ -148,7 +148,7 @@ exports.updateUser = async(req,res)=>{
             {name ,email,phone,status},
             {new:true,runValidators:true}
          );
-         if(user) return res.status(404).json({message:"not found"
+         if(!user) return res.status(404).json({message:"not found"
 
          })
          res.json(user);
