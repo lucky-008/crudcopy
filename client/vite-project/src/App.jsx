@@ -1,6 +1,8 @@
 import React from "react";
 import { Plus, Users } from "lucide-react";
 import StatsCard from "./components/StatsCard";
+import SearchBar from "./components/SearchBar";
+import UserTable from "./components/UserTable";
 
 function App() {
   return (
@@ -14,7 +16,7 @@ function App() {
 
             </div>
             <div>
-              <h1 className="text-3l font-bold text-white" >User Manageme</h1>
+              <h1 className="text-3l font-bold text-white" >User Management </h1>
               <p className="text-gray-400 mt-1">MERN stack application</p>
 
             </div>
@@ -30,6 +32,14 @@ function App() {
        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
          <StatsCard />
        </div>
+
+
+
+<SearchBar />
+
+<UserTable />
+
+
       </main>
 
     </div>
