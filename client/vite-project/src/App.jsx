@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, Users } from "lucide-react";
+import { Plus, User, Users } from "lucide-react";
 import StatsCard from "./components/StatsCard";
 import SearchBar from "./components/SearchBar";
 import UserTable from "./components/UserTable";
@@ -143,7 +143,7 @@ const closeModel = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-         <StatsCard />
+         <StatsCard title="Total users" value={{number:stats.total}} icon={<Users />}  bgicon="bg-indigo-500" iconColor="text-white" gradient="from-indigo-900 to-indigo-700" />
        </div>
 
 
