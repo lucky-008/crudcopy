@@ -4,8 +4,30 @@ import StatsCard from "./components/StatsCard";
 import SearchBar from "./components/SearchBar";
 import UserTable from "./components/UserTable";
 import UserModel from "./components/UserModel";
+import { getUsers, searchUsers,getStats,addUser,deleteUser } from "./api/userApi";
+import { useState } from "react";
+ 
 
 function App() {
+
+  const [users, setUsers]= useState([])
+  const [totalUsers, setTotalUsers]= useState(0)
+  const [stats, setStats]= useState({total:0, active:0, inactive:0})
+  const [searchTerm, setSearchTerm]= useState("")
+  const [isModalOpen, setIsModalOpen]= useState(false)
+  const [formData, setFormData]= useState({
+    name:"",
+    email:"",
+    phone:"",
+    status:"active",
+  })
+  const [editingItem, setEditingItem] = useState(null);
+const [loading, setLoading] = useState(false);
+const [currentPage, setCurrentPage] = useState(1);
+const [itemsPerpage, setItemsPerPage] = useState(5);
+const [totalPages, setTotalPages] = useState(0);
+
+const status = ["Active", "Inactive"];
   return (
     <div className="min-h-screen bg-gray-950">
       {/* Header */}
@@ -40,7 +62,7 @@ function App() {
 
 <UserTable />
 
-<UserModel />
+{/* <UserModel /> */}
 
 
       </main>
