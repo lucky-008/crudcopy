@@ -1,24 +1,26 @@
-const User = require('../models/userModel')
+const User = require("../models/userModel");
 
-exports.getStats = async(req,res)=>{
-    try {
+/* =========================
+   GET STATS
+========================= */
+exports.getStats = async (req, res) => {
+  try {
+    const total = await User.countDocuments();
+    const active = await User.countDocuments({ status: "Active" });
+    const inactive = await User.countDocuments({ status: "Inactive" });
 
-        const total= await User.countDocuments();
-        const active= await User.countDocuments({status:"Active"});
-        const Inactive= await User.countDocuments({status:"Inactive"});
-        res.json({total,active,Inactive});
-        
-
-         
-        
-    } catch (error) {
-        res.status(500).json({message:"fetch error", error: error.message})
-        
-    }
+    res.status(200).json({ total, active, inactive });
+  } catch (error) {
+    res.status(500).json({
+      message: "fetch stats error",
+      error: error.message,
+    });
+  }
 };
 
-
-
+/* =========================
+   SEARCH USERS
+========================= */
 exports.searchUsers = async (req, res) => {
   try {
     const query = req.params.query;
@@ -48,17 +50,18 @@ exports.searchUsers = async (req, res) => {
       totalPages: Math.ceil(total / limit),
       totalUsers: total,
     });
-
   } catch (error) {
     res.status(500).json({
-      message: "searching error",
+      message: "search error",
       error: error.message,
     });
   }
 };
 
-
-   exports.getAllUsers = async (req, res) => {
+/* =========================
+   GET ALL USERS
+========================= */
+exports.getAllUsers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -77,108 +80,137 @@ exports.searchUsers = async (req, res) => {
       totalPages: Math.ceil(total / limit),
       totalUsers: total,
     });
+  } catch (error) {
+    res.status(500).json({
+      message: "get users error",
+      error: error.message,
+    });
+  }
+};
 
+/* =========================
+   GET USER BY ID
+========================= */
+exports.getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json(user);
   } catch (error) {
     res.status(500).json({
       message: "get user error",
       error: error.message,
     });
   }
-}
+};
 
+/* =========================
+   CREATE USER
+========================= */
+exports.createUser = async (req, res) => {
+  try {
+    let { name, email, phone, status } = req.body;
 
-exports.getUserById= async(req,res)=>{
-    try {
-
-        const user = await User.findById(req.params.id)
-        if(!user) return res.status(404)
-.json({message:"user not found"});
-        res.json(user);
-        
-    } catch (error) {
-             res.status(500).json({message:"get user error", error: error.message})
-   
+    if (!name || !email || !phone) {
+      return res.status(400).json({
+        message: "Name, email and phone are required",
+      });
     }
-}
 
+    // Normalize status
+    status = status
+      ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
+      : "Active";
 
-exports.createUser = async(req,res)=>{
-    try {
-        const{name , email,phone,status}= req.body;
-        if(!name || !email || !phone)
-            return res.status(400).json({
-        message:"Name email  and phone are required"});
+    const existingUser = await User.findOne({ email });
+    if (existingUser)
+      return res.status(400).json({ message: "Email already exists" });
 
+    const user = new User({
+      name,
+      email,
+      phone,
+      status,
+    });
 
-        const existingUser = await User.findOne({email});
-        if(existingUser) return res.status(400).json({message:"already exist"});
+    await user.save();
 
-        const user =  new User ({
-            name,
-            email,
-            phone,
-            status : status || "Active"
+    res.status(201).json({
+      message: "User created successfully",
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "create user error",
+      error: error.message,
+    });
+  }
+};
 
-        })
+/* =========================
+   UPDATE USER
+========================= */
+exports.updateUser = async (req, res) => {
+  try {
+    let { name, email, phone, status } = req.body;
 
-        await user.save();
-        res.status(201).json({user, message:"record created"} );
-
-                                                                 
-        
-    } catch (error) {
-                     res.status(500).json({message:"create user error", error: error.message})
-
-        
+    // Normalize status
+    if (status) {
+      status =
+        status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
     }
-}
 
+    // Check duplicate email
+    if (email) {
+      const exists = await User.findOne({
+        email,
+        _id: { $ne: req.params.id },
+      });
 
-exports.updateUser = async(req,res)=>{
-    try {
-         const{name , email,phone,status}= req.body;
-         if(email){
-            const exists = await User.find({email, _id: {$ne: req.params.id}});
-            if(exists.length >0){
-                return res.status(400).json({message:" email already exists"})
-            }
-         }
-
-         const  user= await User.findByIdAndUpdate(req.params.id,
-            {name ,email,phone,status},
-            {new:true,runValidators:true}
-         );
-         if(!user) return res.status(404).json({message:"not found"
-
-         })
-         res.json(user);
-
-
-         
-        
-    } catch (error) {
-                             res.status(500).json({message:"update user error", error: error.message})
-
-        
-        
+      if (exists) {
+        return res.status(400).json({
+          message: "Email already exists",
+        });
+      }
     }
-}
 
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { name, email, phone, status },
+      { new: true, runValidators: true }
+    );
+
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "update user error",
+      error: error.message,
+    });
+  }
+};
+
+/* =========================
+   DELETE USER
+========================= */
 exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
 
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
 
     res.status(200).json({
       message: "User deleted successfully",
       user,
     });
-
   } catch (error) {
     res.status(500).json({
       message: "delete user error",

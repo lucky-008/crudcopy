@@ -1,42 +1,45 @@
 const API_URL = "http://localhost:5000/api/v1/users";
 
-// get users with pagination
+// GET users with pagination
 export const getUsers = async (page = 1, limit = 5) => {
   const res = await fetch(`${API_URL}?page=${page}&limit=${limit}`);
-  if (!res.ok) throw new Error("Failed to fetch users");
-  return res.json();
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch users");
+  return data;
 };
 
-// search users
+// SEARCH users
 export const searchUsers = async (term = "", page = 1, limit = 5) => {
   const res = await fetch(
     `${API_URL}/search/${encodeURIComponent(term)}?page=${page}&limit=${limit}`
   );
-  if (!res.ok) throw new Error("Failed to search users");
-  return res.json();
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to search users");
+  return data;
 };
 
-// Get stats
+// GET stats
 export const getStats = async () => {
   const res = await fetch(`${API_URL}/stats`);
-  if (!res.ok) throw new Error("Failed to get users");
-  return res.json();
-
-
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to get stats");
+  return data;
 };
 
-
+// ADD new user
 export const addUser = async (data) => {
   const res = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Failed to add user");
-  return res.json();
+
+  const resData = await res.json();
+  if (!res.ok) throw new Error(resData.message || "Failed to add user");
+  return resData;
 };
 
-// update existing user
+// UPDATE existing user
 export const updateUser = async (id, data) => {
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
@@ -44,14 +47,15 @@ export const updateUser = async (id, data) => {
     body: JSON.stringify(data),
   });
 
-  if (!res.ok) throw new Error("Failed to update user");
-  return res.json();
+  const resData = await res.json();
+  if (!res.ok) throw new Error(resData.message || "Failed to update user");
+  return resData;
 };
 
-// Delete user
-export const deleteUser = async (id)=>{
-    const res = await fetch(`${API_URL}/${id}`, {method:"DELETE"});
-    if (!res.ok) throw new Error("Failed to delete user");
-  return res.json();
-    
-}
+// DELETE user
+export const deleteUser = async (id) => {
+  const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  const resData = await res.json();
+  if (!res.ok) throw new Error(resData.message || "Failed to delete user");
+  return resData;
+};
