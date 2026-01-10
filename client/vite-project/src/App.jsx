@@ -55,6 +55,7 @@ function App() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (searchTerm) handleSearch();
     else fetchUsers();
   }, [searchTerm, currentPage, itemsPerPage]);
