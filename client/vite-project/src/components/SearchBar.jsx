@@ -1,6 +1,6 @@
 import React from "react";
 
-function SearchBar({ value, onChange, onClear, itemsPerPage, onitemsPerPageChange, currentPage, totalUsers }) {
+function SearchBar({ value, onChange, onClear, itemsPerPage, onitemsPerPageChange, totalUsers }) {
   return (
     <div className="flex flex-wrap items-center gap-4 mb-4">
       <input
