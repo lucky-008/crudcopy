@@ -164,15 +164,7 @@ function App() {
           totalUsers={totalUsers}
         />
 
-        {/* Table */}
-        <UserTable
-          users={users}
-          onEdit={openModel}
-          onDelete={handleDelete}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={(page) => setCurrentPage(page)}
-        />
+        
 
         {/* Modal */}
         <UserModel isOpen={isModalOpen} onClose={closeModel} formData={formData} setFormData={setFormData} onSubmit={handleSubmit} loading={loading} />
